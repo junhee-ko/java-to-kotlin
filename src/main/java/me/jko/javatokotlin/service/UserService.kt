@@ -1,42 +1,39 @@
-package me.jko.javatokotlin.service;
+package me.jko.javatokotlin.service
 
-import me.jko.javatokotlin.entity.User;
-import me.jko.javatokotlin.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import me.jko.javatokotlin.entity.User
+import me.jko.javatokotlin.repository.UserRepository
+import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
-public class UserService {
+class UserService(private val userRepository: UserRepository) {
 
-    private final UserRepository userRepository;
+    fun createUser(name: String, email: String): User {
+        val user = User()
+        user.name = name
+        user.email = email
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        return userRepository.save(user)
     }
 
-    public User createUser(String name, String email) {
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-
-        return userRepository.save(user);
+    fun getUserById(id: Long): Optional<User> {
+        return userRepository.findById(id)
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    fun updateUsername(id: Long, updateName: String): User {
+        val user = userRepository.findById(id)
+            .orElseThrow {
+                RuntimeException(
+                    "User not found with id: $id"
+                )
+            }
+
+        user.name = updateName
+
+        return userRepository.save(user)
     }
 
-    public User updateUsername(Long id, String updateName) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-
-        user.setName(updateName);
-
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    fun deleteUser(id: Long) {
+        userRepository.deleteById(id)
     }
 }
